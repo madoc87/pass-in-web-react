@@ -1,0 +1,226 @@
+    ## Componentes
+Componentes são formas de se separar a nossa aplicação em varios blocos;
+
+Componentes geralmente são criados em duas situacoes:
+
+Primeiro: Quando vemos um padrão de repetição
+Segundo: Quando conseguimos desconectar uma parte da interface da outra, porque elas não se conversao entre si, são elementos que funcionam quase que independentes um do outro, que eles possam existir sem outra parte do codigo, como por exemplo um cabeçalho que pode existir em varias paginas da mesma aplicação e ela não está diretamente ligada com a pagina que está sendo carregada. Então nessa aplicação o cabeçalho será um componente e a lista de eventos ou a lista de participantes será outro componente;
+
+Componentes são funções que retornam um HTML, Componentes podem ser comparados a elementos dentro do HTML;
+
+Elementos que se repetem na aplicação, como um padrão de repetição, como por exemplo os botoes, uma linha com os dados do participante, etc;
+
+No react todo componente inicia com uma letra maiuscula;
+
+No react se usa "className" no lugar de "class", porque class é uma palavra reservada para o JavaScript;
+
+Todo componente, assim como as Tags no HTML eles podem receber um atributo, com exemplo:
+A tag <img> pode receber varios atributos como "src", "width", etc. 
+E os Componentes no react podem receber tambem um atributo, que são chamados de PROPRIEDADES;
+
+
+As Propriedades são declaradas da mesma forma que os atributos no HTML, então vamos criar um componente chamado "MeuBotão"e adicionar uma propriedade chamada "texto" com conteúdo "Clique aqui", por exemplo:
+
+---
+//Criação do componente botão
+function MeuBotão() {
+    return <button>Teste</button>
+}
+
+Essa função acima irá criar o componente com um botão e o texto padrão dentro dele é "Teste", para usar a propriedade que iremos adicionar a abaixo devemos usar a palavra "props" como argumento da função e depois passar o conteudo dela no lugar da palavra "Teste", mas como "props" é uma variavel dentro do JS para ela ser usada deve ser entre chaves, caso contrario ela será reconhecida como um texto simples. 
+
+Depois de adicionar dentro do texto do botão a variavel "props" precisamos detalhar qual atributo estamos querendo acessar e para isso adicionamos um ponto e o nome do atributo que nesse caso será "texto", então o codigo ficará assim:
+
+---
+//Alteração do componente para receber uma propriedade e usar ela como o texto do botão
+function MeuBotão(props) {
+    return <button>{props.texto}</button>
+}
+
+Com componente criado iremos agora usar o botão e passar o atributo nele que será usado para o nome:
+
+---
+//Uso do componente
+<MeuBotão texto="Clique aqui" />
+
+
+Podemos criar quantas propriedade forem necessarias;
+
+
+
+Em caso do uso de TypeScrip o codigo irá apresentar um erro, pois as props não foram tipadas, então para corrigir isso iremos adicionar no inicio do codigo as linhas abaixo:
+
+---
+interface MeuBotaoProps {
+    texto: String
+}
+
+Depois da declaração do tipo de conteudo o atributo "texto" vai receber (que no caso é um texto e por isso foi declarada como uma String), temos que adicionar no componente, adicionando depois da palavra props dois pontos e o nome que foi dado na declaração acima:
+
+---
+function MeuBotão(props: MeuBotaoProps) {
+    return <button>{props.texto}</button>
+}
+
+Isso traz uma inteligencia para a escrita do codigo não permitindo que alguns erros simples seja cometidos e facilitando pelo reconhecimento de como os Componentes funcionam, por exemplo no proximo uso do componente "MeuBotão" se o atributo (props) não for declarado o codigo apresentará um erro informando que está faltando uma propriedade orbrigatoria;
+
+
+
+Tailwind
+Para desenvolver o layout desse aplicação iremos utilizar o Tailwindo CSS;
+
+É um utility class
+
+
+
+
+
+
+## Children
+Children, são propriedades enviadas dentro das tags, por exemplo
+o componente <NavLink> é um Link do Menu na declaração dele vamos usar da seguinte forma:
+
+<NavLink>Eventos</NavLink>
+
+O texto eventos não está sendo passada como uma "props" do componente, mas como um texto dentro da tag, então não pode ser usada da mesma forma, para isso vamos usar o "Children", associado com o props, pois é como um filho da tag "NavLink", que está dentro dela, ficando assim:
+
+---
+export function NavLink(props) {
+    return (
+        <a>{props.children}</a>
+    )
+}
+
+Assim o texto que for enviado dentro da tag <NavLink> será adicionado ao componente;
+
+
+
+
+
+## Extends ComponentProps
+Como extender todas as propriedades de um elemento nativo do HTML e repassar todas elas para um elemento dentro do componente
+
+Normalmente para repassar propriedades para um componente devemos enviar dentro do HTML e depois receber cada uma delas no componente, por exemplo, vamos manter o exemplo do "NavLink" anterior:
+
+No HTML vamos declarar:
+
+---
+<NavLink href="/meulink" title="Meu Titulo" target="_blank" />
+
+
+E no componente vamos ter que receber essas "props":
+
+---
+export function NavLink(props) {
+    return (
+        <a props.href props.title props.target>{props.children}</a>
+    )
+}
+
+E fazer isso para todos os elementos do HTML seria muito trabalhoso, então para facilitar podemos usar todas as propriedades enviadas do HTML para o componente, usando uma importação do React chamada "ComponentsProps" importando ela no inicio do codigo e alterando como o componente recebe os atributos ficando assim:
+
+---
+import { ComponentProps } from "react"
+
+export function NavLink(props) {
+    return (
+        <a {...props} className="font-medium text-sm">{props.children}</a>
+    )
+}
+
+o uso do "...props" vai trazer todos os elementos enviados no HTML na tag;
+
+
+#Ajuste do TypeScript 
+No caso de estar usando o TypeScript no projeto o mesmo apresentará erro por não ter declarado a tipagem dos elementos, então no caso do children, vamos adicionar a tipagem como "string" e para o uso do ComponentProps vamos usar o extends ficando assim:
+
+---
+import { ComponentProps } from "react"
+
+interface NavLinkProps extends ComponentProps<'a'> {
+    children: string
+}
+
+export function NavLink(props: NavLinkProps) {
+    return (
+        <a {...props} className="font-medium text-sm">{props.children}</a>
+    )
+}
+
+
+Então iremos adicionar logo abaixo do "import" a "interface" com o nome que iremos usar no componente e extender para o "ComponentProps" e adicionar a tag que será usada no componente, no caso a tag "a" e assim o TypeScrip ja reconhece todos os tipos que serão usados no componente vão ser os mesmo da tag HTML <a> e entao logo em seguida vamos declarar apenas o tipo da variavel "children". 
+
+E por fim vamos adicionar na função do componente o nome que criamos ao declarar a "interface" antecedido por dois pontos;
+
+
+
+## Estados no React
+Estados React na mais sao do que variaveis, porem essas variaveis sao observaveis e quando o valor dessas variaveis é alterado, por qualquer motivo que seja o componente renderiza novamente, ou seja o componente é criado em tela novamente. Por exempo toda vez que um usuario digitar um valor dentro de um input, esse valor vai ser mostrado em tela em tempo real. Isso pode ser feito adicionando um atributo do tipo "listening" como o "onChange";
+ 
+ Então para capturar o valor do "input" a função abaixo ela recebe um evento que vamos chamar de "event" e dentro desse evento existem varias informações e uma dela é o "target" e dentro do "target" tem o "value" que é o conteúdo do que está sendo digitado no input, então para acessar esse valor precisamos 
+
+
+---
+[TSX]
+function nomeDaFuncao(event) {}
+console.log(event.target.value)
+
+[HTML]
+<input onChange={nomeDaFuncao} />
+
+
+
+Como estamos usando o TypeScrip toda vez que criamos uma função temos que definir qual que é o formato da variavel "event". Se passarmos o mouse no "onChange" do "input" ele fala que é um "ChangeEventHandler" e ao pressionar Ctrl e clicar em cima do "onChange" ele abre um outro arquivo mostrando esse evento e ao clicar novamente com o Ctrl pressionado no "ChangeEventHandler" ele irá mostrar qual o evento que ele envia que no caso é um "ChangeEvent", então isso pode ser usado na função. Mas o "ChangeEvent" pode ser disparado por varios elementos, então precisamos passar pra ele qual que é o elemento que está disparando então temos que adicionar um "<HTMLInputElement>", então com isso estamos falando que quem está disparando o evento é um "input" assim ele sabe que existe o "value", porque o "value" so existe dentro do um "input";
+
+---
+[TSX]
+function nomeDaFuncao(event: ChangeEvent<HTMLInputElement>) {}
+console.log(event.target.value)
+
+[HTML]
+<input onChange={nomeDaFuncao} />
+---
+
+
+  Então agora que já estamos capturando o valor do digitado no "input" ele ainda não será mostrado porque o elemento é criado apenas umas vez, então vamos usar um conceito do React chamado Estado e é declarado com uma variavel recebendo o "useState()" e ele retorna um array com duas posições, então ao inves de declarar como:
+
+---
+ const valorDoInput = useState('') 
+---
+
+Vamos desestruturar essess array, onde a primeira posição recebemos o valor do input que vamos chamar de "valorDoInput" e na segunda posição vamos receber uma função para alterar esse valor do input que vamos chamar de "alteraOValorDoInput". Então para alterar o valor do "input" vamos chamar a função "alteraOValorDoInput" e adicionar a variavel "valorDoInput" no HTML da pagina entre chaves, com o codigo ficando assim:
+
+---
+ [TSX]
+const [valorDoInput, alteraOValorDoInput] = useState('')
+
+function nomeDaFuncao(event) {
+    alteraOValorDoInput(event.target.value)
+}
+
+
+[HTML]
+<input onChange={nomeDaFuncao} />
+{valorDoInput}
+---
+
+Assim ao digitar no input o que for digitado aparece em tempo real onde a variavel "valorDoInput" estiver, visto que sempre que o valor do input for alterado, ele chama a função "nomeDaFuncao" e ela recebe o "event" com todas as informações incluindo o valor do que está sendo digitado e chama a função "alteraOValorDoInput" que está recebendo apenas o valor do "input" e altera o valor da variavel "valorDoInput" com a propriedade "useState".
+
+Ou seja o ESTADO no React nada mais é que uma forma de OBSERVAR, MONITORAR, ASSITIR AS MUDANÇAS DE VALOR DE UMA VARIAVEL seja ela qual for, seja ela uma String, um numero, um array, um objeto, etc em tempo real.
+
+
+
+## useEffect()
+
+O useEffect é uma forma do React disparar uma função somente quando a gente quiser, e isso é determinado apartir do segundo parametro que é passado para o useEffect que é um array. Esse array ele pode conter ou nao algumas variaveis.
+
+Ex.:
+---
+userEffect(() => {}, [page])
+---
+Nesse caso a primeiro parametro que é uma função só vai ser executada quando o segundo parametro/estado "page" for alterado, se qualquer outro parametro for alterado ele não vai ser executado.
+
+
+## URL State 
+é armazenar na URL da aplicação todo o estado que vem do input do usuario e que queremos persistir quando o usuario recarregar a pagina ou o usuario enviar o link para outra pessoa.
+
